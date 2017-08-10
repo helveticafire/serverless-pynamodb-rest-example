@@ -15,12 +15,11 @@ package:
     - package.json
     - package-lock.json
     - requirements.txt
-    - requirements-dev.txt
     - todos/test/**
 
 provider:
   name: aws
-  runtime: python2.7
+  runtime: python3.6
   region: eu-central-1
   environment:
     DYNAMODB_TABLE: ${self:service}-${opt:stage, self:provider.stage}
