@@ -7,7 +7,6 @@ from pynamodb.models import Model
 
 class TodoModel(Model):
     class Meta:
-        table_name = os.environ['DYNAMODB_TABLE']
         if 'ENV' in os.environ:
             host = 'http://localhost:8000'
         else:

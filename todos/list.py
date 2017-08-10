@@ -1,9 +1,16 @@
 import json
+import os
 
 from todos.todo_model import TodoModel
 
 
 def todo_list(event, context):
+    try:
+        TodoModel.Meta.table_name = os.environ['DYNAMODB_TABLE']
+    except KeyError:
+        return {'statusCode': 500,
+                'body': json.dumps({'error': 'ENV_VAR_NOT_SET'})}
+
     # fetch all todos from the database
     results = TodoModel.scan()
 
