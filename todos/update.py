@@ -43,15 +43,14 @@ def update(event, context):
                 'body': json.dumps({'error': 'VALIDATION_FAILED',
                                     'error_message': 'Couldn\'t update the todo item.'})}
 
-    todo_changed = False
-    if 'text' in data and data['text'] != found_todo.text:
+    text_attr_changed = 'text' in data and data['text'] != found_todo.text
+    if text_attr_changed:
         found_todo.text = data['text']
-        todo_changed = True
-    if 'checked' in data and data['checked'] != found_todo.checked:
+    checked_attr_changed = 'checked' in data and data['checked'] != found_todo.checked
+    if checked_attr_changed:
         found_todo.checked = data['checked']
-        todo_changed = True
 
-    if todo_changed:
+    if text_attr_changed or checked_attr_changed:
         found_todo.save()
     else:
         logging.info('Nothing changed did not update')
