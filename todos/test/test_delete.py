@@ -1,5 +1,3 @@
-
-
 from unittest import TestCase
 from mock import mock
 from pynamodb.exceptions import DoesNotExist, DeleteError
@@ -9,7 +7,6 @@ from todos.delete import delete
 @mock.patch('todos.delete.TodoModel')
 @mock.patch('os.environ', {})
 class TestGetEnvVar(TestCase):
-
     def test_env_missing_vars(self, _):
         context_mock = mock.MagicMock()
         context_mock.function_name = 'create'
@@ -18,10 +15,10 @@ class TestGetEnvVar(TestCase):
         self.assertIn('ENV_VAR_NOT_SET', response['body'])
         self.assertEqual(response['statusCode'], 500)
 
+
 @mock.patch('todos.delete.TodoModel')
 @mock.patch('os.environ', {'DYNAMODB_TABLE': 'todo_table'})
 class TestDelete(TestCase):
-
     def setUp(self):
         self.context_mock = mock.MagicMock()
         self.context_mock.function_name = 'create'
@@ -47,7 +44,7 @@ class TestDelete(TestCase):
         self.assertIn('DELETE_FAILED', response['body'])
         self.assertEqual(response['statusCode'], 400)
 
-    def test_delete_success(self, mock_model):
+    def test_delete_success(self, _):
         response = delete({'path': {'todo_id': '1'}}, self.context_mock)
         self.assertNotIn('body', response)
         self.assertEqual(response['statusCode'], 204)

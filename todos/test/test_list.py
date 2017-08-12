@@ -1,12 +1,13 @@
 from unittest import TestCase
+
 from mock import mock
+
 from todos.list import todo_list
 
 
 @mock.patch('todos.list.TodoModel')
 @mock.patch('os.environ', {})
 class TestListEnvVar(TestCase):
-
     def test_env_missing_vars(self, _):
         context_mock = mock.MagicMock()
         context_mock.function_name = 'create'
@@ -15,10 +16,10 @@ class TestListEnvVar(TestCase):
         self.assertIn('ENV_VAR_NOT_SET', response['body'])
         self.assertEqual(response['statusCode'], 500)
 
+
 @mock.patch('todos.list.TodoModel')
 @mock.patch('os.environ', {'DYNAMODB_TABLE': 'todo_table'})
 class TestList(TestCase):
-
     def setUp(self):
         self.context_mock = mock.MagicMock()
         self.context_mock.function_name = 'create'

@@ -2,6 +2,7 @@ import json
 import os
 
 from pynamodb.exceptions import DoesNotExist, DeleteError
+
 from todos.todo_model import TodoModel
 
 

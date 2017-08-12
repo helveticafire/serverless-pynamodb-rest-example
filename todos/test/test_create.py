@@ -1,7 +1,9 @@
 from unittest import TestCase
 
 import mock
+
 from todos.create import create
+
 
 @mock.patch('todos.create.TodoModel')
 class TestCreateSuccess(TestCase):
@@ -18,7 +20,6 @@ class TestCreateSuccess(TestCase):
 @mock.patch('todos.create.TodoModel')
 @mock.patch('os.environ', {})
 class TestCreateEnvVar(TestCase):
-
     def test_env_missing_vars(self, _):
         context_mock = mock.MagicMock()
         context_mock.function_name = 'create'
@@ -31,7 +32,6 @@ class TestCreateEnvVar(TestCase):
 @mock.patch('todos.create.TodoModel')
 @mock.patch('os.environ', {'DYNAMODB_TABLE': 'todo_table'})
 class TestCreate(TestCase):
-
     def setUp(self):
         self.context_mock = mock.MagicMock()
         self.context_mock.function_name = 'create'

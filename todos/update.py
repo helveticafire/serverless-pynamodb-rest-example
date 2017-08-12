@@ -3,11 +3,11 @@ import logging
 import os
 
 from pynamodb.exceptions import DoesNotExist
+
 from todos.todo_model import TodoModel
 
 
 def update(event, context):
-
     try:
         TodoModel.Meta.table_name = os.environ['DYNAMODB_TABLE']
     except KeyError:
