@@ -9,9 +9,10 @@ from todos.todo_model import TodoModel
 def create(event, context):
     try:
         TodoModel.Meta.table_name = os.environ['DYNAMODB_TABLE']
-    except KeyError:
+    except KeyError as err:
         return {'statusCode': 500,
-                'body': json.dumps({'error': 'ENV_VAR_NOT_SET'})}
+                'body': json.dumps({'error': 'ENV_VAR_NOT_SET',
+                                    'error_message': '{0} is missing from environment variables'.format(str(err))})}
 
     try:
         data = json.loads(event['body'])
