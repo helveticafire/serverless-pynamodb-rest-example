@@ -23,6 +23,7 @@ provider:
   region: eu-central-1
   environment:
     DYNAMODB_TABLE: ${self:service}-${opt:stage, self:provider.stage}
+    DYNAMODB_REGION: ${self:provider.region}
   iamRoleStatements:
     - Effect: Allow
       Action:

@@ -20,7 +20,8 @@ class TestGetEnvVar(TestCase):
 
 
 @mock.patch('todos.get.TodoModel')
-@mock.patch('os.environ', {'DYNAMODB_TABLE': 'todo_table'})
+@mock.patch('os.environ', {'DYNAMODB_TABLE': 'todo_table',
+                           'DYNAMODB_REGION': 'eu-central-1'})
 class TestGet(TestCase):
     def setUp(self):
         self.context_mock = mock.MagicMock(function_name='get', aws_request_id='123')

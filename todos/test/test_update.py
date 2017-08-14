@@ -20,7 +20,8 @@ class TestUpdateEnvVar(TestCase):
 
 
 @mock.patch('todos.update.TodoModel')
-@mock.patch('os.environ', {'DYNAMODB_TABLE': 'todo_table'})
+@mock.patch('os.environ', {'DYNAMODB_TABLE': 'todo_table',
+                           'DYNAMODB_REGION': 'eu-central-1'})
 class TestUpdate(TestCase):
     def setUp(self):
         self.context_mock = mock.MagicMock(function_name='update', aws_request_id='123')

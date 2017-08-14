@@ -18,7 +18,8 @@ class TestGetEnvVar(TestCase):
 
 
 @mock.patch('todos.delete.TodoModel')
-@mock.patch('os.environ', {'DYNAMODB_TABLE': 'todo_table'})
+@mock.patch('os.environ', {'DYNAMODB_TABLE': 'todo_table',
+                           'DYNAMODB_REGION': 'eu-central-1'})
 class TestDelete(TestCase):
     def setUp(self):
         self.context_mock = mock.MagicMock(function_name='delete', aws_request_id='123')

@@ -7,11 +7,8 @@ from pynamodb.models import Model
 
 class TodoModel(Model):
     class Meta:
-        if 'ENV' in os.environ:
-            host = 'http://localhost:8000'
-        else:
-            region = 'eu-central-1'
-            host = 'https://dynamodb.eu-central-1.amazonaws.com'
+        region = 'localhost'
+        host = 'http://localhost:8000'
 
     todo_id = UnicodeAttribute(hash_key=True, null=False)
     text = UnicodeAttribute(null=False)
@@ -26,3 +23,10 @@ class TodoModel(Model):
     def __iter__(self):
         for name, attr in self._get_attributes().items():
             yield name, attr.serialize(getattr(self, name))
+
+    @staticmethod
+    def setup_model(model, region, table_name, is_remote):
+        model.Meta.table_name = table_name
+        model.Meta.region = region
+        if is_remote:
+            model.Meta.host = 'https://dynamodb.{0}.amazonaws.com'.format(region)
