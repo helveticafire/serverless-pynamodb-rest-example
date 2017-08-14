@@ -4,7 +4,7 @@
   "description": "Serverless CRUD service exposing a REST HTTP interface",
   "author": "",
   "license": "MIT",
-  "dependencies": {
+  "devDependencies": {
     "serverless-python-requirements": "^2.4.1"
   }
 }
