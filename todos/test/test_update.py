@@ -61,10 +61,10 @@ class TestUpdate(TestCase):
     def test_update_successful(self, mock_model):
         found_todo = mock.MagicMock()
         found_todo.checked = False
-        found_todo.text = "blah"
+        found_todo.text = "todo 1"
         mock_model.get.return_value = found_todo
         response = update({'path': {'todo_id': '1'},
-                           'body': '{"text": "blah", "checked": true}'}, self.context_mock)
+                           'body': '{"text": "todo 1 update", "checked": true}'}, self.context_mock)
         body_json = json.loads(response['body'])
         mock_model.get.assert_called_once_with(hash_key='1')
         found_todo.save.assert_called_once()
