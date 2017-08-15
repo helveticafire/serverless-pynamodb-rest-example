@@ -1,4 +1,3 @@
-import os
 from datetime import datetime
 
 from pynamodb.attributes import UnicodeAttribute, BooleanAttribute, UTCDateTimeAttribute
@@ -13,11 +12,11 @@ class TodoModel(Model):
     todo_id = UnicodeAttribute(hash_key=True, null=False)
     text = UnicodeAttribute(null=False)
     checked = BooleanAttribute(null=False, default=False)
-    createdAt = UTCDateTimeAttribute(null=False, default=datetime.now())
-    updatedAt = UTCDateTimeAttribute(null=False)
+    created_at = UTCDateTimeAttribute(null=False, default=datetime.now())
+    updated_at = UTCDateTimeAttribute(null=False)
 
     def save(self, conditional_operator=None, **expected_values):
-        self.updatedAt = datetime.now()
+        self.updated_at = datetime.now()
         super(TodoModel, self).save()
 
     def __iter__(self):
