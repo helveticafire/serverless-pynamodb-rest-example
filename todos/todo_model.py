@@ -24,7 +24,7 @@ class TodoModel(Model):
             yield name, attr.serialize(getattr(self, name))
 
     @staticmethod
-    def setup_model(model, region, table_name, is_remote):
+    def setup_model(model, region, table_name, is_remote=False):
         model.Meta.table_name = table_name
         model.Meta.region = region
         if is_remote:
