@@ -1,16 +1,15 @@
 import json
 from unittest import TestCase
-
-from mock import mock
+from unittest.mock import patch, MagicMock
 
 from todos.list import todo_list
 
 
-@mock.patch('todos.list.TodoModel')
-@mock.patch('os.environ', {})
+@patch('todos.list.TodoModel')
+@patch('os.environ', {})
 class TestListEnvVar(TestCase):
     def test_env_missing_vars(self, _):
-        context_mock = mock.MagicMock(function_name='list', aws_request_id='123')
+        context_mock = MagicMock(function_name='list', aws_request_id='123')
         response = todo_list({}, context_mock)
         body_json = json.loads(response['body'])
         self.assertEquals('ENV_VAR_NOT_SET', body_json['error'])
@@ -18,12 +17,12 @@ class TestListEnvVar(TestCase):
         self.assertEqual(response['statusCode'], 500)
 
 
-@mock.patch('todos.list.TodoModel')
-@mock.patch('os.environ', {'DYNAMODB_TABLE': 'todo_table',
+@patch('todos.list.TodoModel')
+@patch('os.environ', {'DYNAMODB_TABLE': 'todo_table',
                            'DYNAMODB_REGION': 'eu-central-1'})
 class TestList(TestCase):
     def setUp(self):
-        self.context_mock = mock.MagicMock(function_name='list', aws_request_id='123')
+        self.context_mock = MagicMock(function_name='list', aws_request_id='123')
         super(TestList, self).setUp()
 
     def test_list_success(self, mock_model):

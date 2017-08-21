@@ -1,15 +1,17 @@
 import json
 from unittest import TestCase
-from mock import mock
+from unittest.mock import patch, MagicMock
+
 from pynamodb.exceptions import DoesNotExist, DeleteError
+
 from todos.delete import delete
 
 
-@mock.patch('todos.delete.TodoModel')
-@mock.patch('os.environ', {})
+@patch('todos.delete.TodoModel')
+@patch('os.environ', {})
 class TestGetEnvVar(TestCase):
     def test_env_missing_vars(self, _):
-        context_mock = mock.MagicMock(function_name='delete', aws_request_id='123')
+        context_mock = MagicMock(function_name='delete', aws_request_id='123')
         response = delete({}, context_mock)
         body_json = json.loads(response['body'])
         self.assertEquals('ENV_VAR_NOT_SET', body_json['error'])
@@ -17,12 +19,12 @@ class TestGetEnvVar(TestCase):
         self.assertEqual(response['statusCode'], 500)
 
 
-@mock.patch('todos.delete.TodoModel')
-@mock.patch('os.environ', {'DYNAMODB_TABLE': 'todo_table',
+@patch('todos.delete.TodoModel')
+@patch('os.environ', {'DYNAMODB_TABLE': 'todo_table',
                            'DYNAMODB_REGION': 'eu-central-1'})
 class TestDelete(TestCase):
     def setUp(self):
-        self.context_mock = mock.MagicMock(function_name='delete', aws_request_id='123')
+        self.context_mock = MagicMock(function_name='delete', aws_request_id='123')
         super(TestDelete, self).setUp()
 
     def test_path_param_missing(self, _):
@@ -43,7 +45,7 @@ class TestDelete(TestCase):
         self.assertEqual(response['statusCode'], 404)
 
     def test_todo_cannot_delete(self, mock_model):
-        found_todo = mock.MagicMock()
+        found_todo = MagicMock()
         found_todo.delete.side_effect = DeleteError()
         mock_model.get.return_value = found_todo
         response = delete({'path': {'todo_id': '1'}}, self.context_mock)
@@ -53,7 +55,7 @@ class TestDelete(TestCase):
         self.assertEqual(response['statusCode'], 400)
 
     def test_delete_success(self, mock_model):
-        found_todo = mock.MagicMock()
+        found_todo = MagicMock()
         found_todo.checked = False
         found_todo.text = "blah"
         mock_model.get.return_value = found_todo

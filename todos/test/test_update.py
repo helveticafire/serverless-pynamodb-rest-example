@@ -1,17 +1,17 @@
 import json
 from unittest import TestCase
+from unittest.mock import patch, MagicMock
 
-from mock import mock
 from pynamodb.exceptions import DoesNotExist
 
 from todos.update import update
 
 
-@mock.patch('todos.update.TodoModel')
-@mock.patch('os.environ', {})
+@patch('todos.update.TodoModel')
+@patch('os.environ', {})
 class TestUpdateEnvVar(TestCase):
     def test_env_missing_vars(self, _):
-        context_mock = mock.MagicMock(function_name='update', aws_request_id='123')
+        context_mock = MagicMock(function_name='update', aws_request_id='123')
         response = update({}, context_mock)
         body_json = json.loads(response['body'])
         self.assertEquals('ENV_VAR_NOT_SET', body_json['error'])
@@ -19,12 +19,12 @@ class TestUpdateEnvVar(TestCase):
         self.assertEqual(response['statusCode'], 500)
 
 
-@mock.patch('todos.update.TodoModel')
-@mock.patch('os.environ', {'DYNAMODB_TABLE': 'todo_table',
+@patch('todos.update.TodoModel')
+@patch('os.environ', {'DYNAMODB_TABLE': 'todo_table',
                            'DYNAMODB_REGION': 'eu-central-1'})
 class TestUpdate(TestCase):
     def setUp(self):
-        self.context_mock = mock.MagicMock(function_name='update', aws_request_id='123')
+        self.context_mock = MagicMock(function_name='update', aws_request_id='123')
         super(TestUpdate, self).setUp()
 
     def test_path_param_missing(self, _):
@@ -38,7 +38,7 @@ class TestUpdate(TestCase):
         response = update({'body': '', 'path': {'todo_id': '1'}}, self.context_mock)
         body_json = json.loads(response['body'])
         self.assertEquals('JSON_IRREGULAR', body_json['error'])
-        self.assertEquals('No JSON object could be decoded', body_json['error_message'])
+        self.assertEquals('Expecting value: line 1 column 1 (char 0)', body_json['error_message'])
         self.assertEqual(response['statusCode'], 400)
 
     def test_todo_not_found(self, mock_model):
@@ -50,7 +50,7 @@ class TestUpdate(TestCase):
         self.assertEqual(response['statusCode'], 404)
 
     def test_text_missing(self, _):
-        with mock.patch('todos.create.logging.error'):
+        with patch('todos.create.logging.error'):
             response = update({'path': {'todo_id': '1'},
                                'body': '{}'}, self.context_mock)
             body_json = json.loads(response['body'])
@@ -59,7 +59,7 @@ class TestUpdate(TestCase):
             self.assertEqual(response['statusCode'], 422)
 
     def test_update_successful(self, mock_model):
-        found_todo = mock.MagicMock()
+        found_todo = MagicMock()
         found_todo.checked = False
         found_todo.text = "todo 1"
         mock_model.get.return_value = found_todo
@@ -73,11 +73,11 @@ class TestUpdate(TestCase):
         self.assertEqual(response['statusCode'], 200)
 
     def test_no_change(self, mock_model):
-        found_todo = mock.MagicMock()
+        found_todo = MagicMock()
         found_todo.checked = True
         found_todo.text = "blah"
         mock_model.get.return_value = found_todo
-        with mock.patch('todos.create.logging.info'):
+        with patch('todos.create.logging.info'):
             response = update({'path': {'todo_id': '1'},
                                'body': '{"text": "blah", "checked": true}'}, self.context_mock)
             mock_model.get.assert_called_once_with(hash_key='1')

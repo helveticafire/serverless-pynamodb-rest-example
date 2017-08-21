@@ -1,17 +1,17 @@
 import json
 from unittest import TestCase
+from unittest.mock import patch, MagicMock
 
-from mock import mock
 from pynamodb.exceptions import DoesNotExist
 
 from todos.get import get
 
 
-@mock.patch('todos.get.TodoModel')
-@mock.patch('os.environ', {})
+@patch('todos.get.TodoModel')
+@patch('os.environ', {})
 class TestGetEnvVar(TestCase):
     def test_env_missing_vars(self, _):
-        context_mock = mock.MagicMock(function_name='get', aws_request_id='123')
+        context_mock = MagicMock(function_name='get', aws_request_id='123')
         response = get({}, context_mock)
         body_json = json.loads(response['body'])
         self.assertEquals('ENV_VAR_NOT_SET', body_json['error'])
@@ -19,12 +19,12 @@ class TestGetEnvVar(TestCase):
         self.assertEqual(response['statusCode'], 500)
 
 
-@mock.patch('todos.get.TodoModel')
-@mock.patch('os.environ', {'DYNAMODB_TABLE': 'todo_table',
+@patch('todos.get.TodoModel')
+@patch('os.environ', {'DYNAMODB_TABLE': 'todo_table',
                            'DYNAMODB_REGION': 'eu-central-1'})
 class TestGet(TestCase):
     def setUp(self):
-        self.context_mock = mock.MagicMock(function_name='get', aws_request_id='123')
+        self.context_mock = MagicMock(function_name='get', aws_request_id='123')
         super(TestGet, self).setUp()
 
     def test_path_param_missing(self, _):
