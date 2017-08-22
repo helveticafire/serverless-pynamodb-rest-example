@@ -44,7 +44,7 @@ jobs:
           name: run tests
           command: |
             . env/bin/activate
-            nosetests
+            nosetests --with-coverage
 
       - store_artifacts:
           path: test-reports
