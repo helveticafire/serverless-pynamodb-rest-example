@@ -6,6 +6,8 @@ from pynamodb.models import Model
 
 class TodoModel(Model):
     class Meta:
+        read_capacity_units = 1
+        write_capacity_units = 1
         region = 'localhost'
         host = 'http://localhost:8000'
 
