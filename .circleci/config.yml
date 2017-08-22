@@ -44,7 +44,7 @@ jobs:
           name: run tests
           command: |
             . env/bin/activate
-            python manage.py test
+            nosetest
 
       - store_artifacts:
           path: test-reports
