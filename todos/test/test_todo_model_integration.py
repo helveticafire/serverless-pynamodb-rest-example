@@ -1,11 +1,11 @@
 from unittest import TestCase
-
+import os
 from todos.todo_model import TodoModel
 
 
 class TestTodoModelIntegration(TestCase):
     def setUp(self):
-        TodoModel.setup_model(TodoModel, 'region', 'todo')
+        TodoModel.setup_model(TodoModel, 'region', 'todo', 'ENV' not in os.environ)
         if not TodoModel.exists():
             TodoModel.create_table(wait=True)
         super(TestTodoModelIntegration, self).setUp()
