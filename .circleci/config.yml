@@ -52,7 +52,7 @@ jobs:
           command: |
             . env/bin/activate
             coveralls
-           when: on_success
+          when: on_success
 
       - store_artifacts:
           path: test-reports
