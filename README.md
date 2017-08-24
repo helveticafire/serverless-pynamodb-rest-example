@@ -4,6 +4,7 @@ description: This example demonstrates how to setup a RESTful Web Service allowi
 layout: Doc
 -->
 [![CircleCI](https://circleci.com/gh/helveticafire/serverless-pynamodb-rest-example/tree/master.svg?style=svg)](https://circleci.com/gh/helveticafire/serverless-pynamodb-rest-example/tree/master)
+[![Coverage Status](https://coveralls.io/repos/github/helveticafire/serverless-pynamodb-rest-example/badge.svg?branch=master)](https://coveralls.io/github/helveticafire/serverless-pynamodb-rest-example?branch=master)
 
 # Serverless REST API
 
