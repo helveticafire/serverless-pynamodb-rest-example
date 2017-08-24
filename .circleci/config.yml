@@ -46,6 +46,14 @@ jobs:
             . env/bin/activate
             nosetests --with-coverage
 
+      # run coveralls!
+      - run:
+          name: coveralls
+          command: |
+            . env/bin/activate
+            coveralls
+           when: on_success
+
       - store_artifacts:
           path: test-reports
           destination: test-reports
