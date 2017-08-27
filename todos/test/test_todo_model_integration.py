@@ -8,6 +8,8 @@ from todos.todo_model import TodoModel
 
 
 class TestIntegrationBase(TestCase):
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+
     def setUp(self, load_dbs=None):
         TodoModel.setup_model(TodoModel, 'region', 'todo' + str(uuid.uuid1()), 'ENV' not in os.environ)
         if not TodoModel.exists():
@@ -58,7 +60,7 @@ class TestTodoModelCreateIntegrationBase(TestIntegrationBase):
 
 class TestTodoModelGetIntegrationBase(TestIntegrationBase):
     def setUp(self, load_dbs=None):
-        super().setUp(load_dbs=['./fixtures/todo_db_0.json'])
+        super().setUp(load_dbs=[os.path.join(self.dir_path, 'fixtures/todo_db_0.json')])
 
     def test_get(self):
         found_todo = TodoModel.get('d490d766-8b60-11e7-adba-e0accb8996e6')
@@ -67,7 +69,8 @@ class TestTodoModelGetIntegrationBase(TestIntegrationBase):
 
 class TestTodoModelDeleteIntegrationBase(TestIntegrationBase):
     def setUp(self, load_dbs=None):
-        super().setUp(load_dbs=['./fixtures/todo_db_0.json'])
+        dir_path = os.path.dirname(os.path.realpath(__file__))
+        super().setUp(load_dbs=[os.path.join(dir_path, 'fixtures/todo_db_0.json')])
 
     def test_delete(self):
         found_todo = TodoModel.get('d490d766-8b60-11e7-adba-e0accb8996e6')
@@ -79,7 +82,7 @@ class TestTodoModelDeleteIntegrationBase(TestIntegrationBase):
 
 class TestTodoModelScanIntegrationBase(TestIntegrationBase):
     def setUp(self, load_dbs=None):
-        super().setUp(load_dbs=['./fixtures/todo_db_0.json'])
+        super().setUp(load_dbs=[os.path.join(self.dir_path, 'fixtures/todo_db_0.json')])
 
     def test_delete(self):
         found_todos = TodoModel.scan()
@@ -91,7 +94,7 @@ class TestTodoModelScanIntegrationBase(TestIntegrationBase):
 
 class TestTodoModelUpdateIntegrationBase(TestIntegrationBase):
     def setUp(self, load_dbs=None):
-        super().setUp(load_dbs=['./fixtures/todo_db_0.json'])
+        super().setUp(load_dbs=[os.path.join(self.dir_path, 'fixtures/todo_db_0.json')])
 
     def test_update(self):
         found_todo = TodoModel.get('d490d766-8b60-11e7-adba-e0accb8996e6')
