@@ -1,8 +1,13 @@
 import json
+import os
 from unittest import TestCase
 from unittest.mock import patch, MagicMock
 
+from freezegun import freeze_time
+
 from pynamodb.exceptions import DoesNotExist
+
+from todos.test.test_todo_model_integration import TestIntegrationBase
 
 from todos.update import update
 
@@ -21,7 +26,7 @@ class TestUpdateEnvVar(TestCase):
 
 @patch('todos.update.TodoModel')
 @patch('os.environ', {'DYNAMODB_TABLE': 'todo_table',
-                           'DYNAMODB_REGION': 'eu-central-1'})
+                      'DYNAMODB_REGION': 'eu-central-1'})
 class TestUpdate(TestCase):
     def setUp(self):
         self.context_mock = MagicMock(function_name='update', aws_request_id='123')
@@ -85,3 +90,33 @@ class TestUpdate(TestCase):
             # TODO: Test response is correct
             self.assertEquals('NOT_FOUND' in body_json, False)
             self.assertEqual(response['statusCode'], 200)
+
+
+@patch('os.environ', {'DYNAMODB_TABLE': 'todo_table',
+                      'DYNAMODB_REGION': 'eu-central-1'})
+@freeze_time("2017-01-14 12:00:01")
+class TestDeleteIntegration(TestIntegrationBase):
+    def setUp(self, load_dbs=None):
+        self.context_mock = MagicMock(function_name='delete', aws_request_id='123')
+        super().setUp(load_dbs=[os.path.join(self.dir_path, 'fixtures/todo_db_0.json')])
+
+    def test_update(self):
+        response = update({'path': {'todo_id': 'd490d766-8b60-11e7-adba-e0accb8996e6'},
+                           'body': '{"text": "yayaya", "checked": true}'}, self.context_mock)
+        self.assertEqual(response['statusCode'], 200)
+        body_json = json.loads(response['body'])
+        self.assertDictEqual(body_json, {'checked': True,
+                                         'created_at': '2017-08-27T21:49:25.310975+0000',
+                                         'text': 'yayaya',
+                                         'todo_id': 'd490d766-8b60-11e7-adba-e0accb8996e6',
+                                         'updated_at': '2017-01-14T12:00:01.000000+0000'})
+
+
+    def test_update_get_failed(self):
+        response = update({'path': {'todo_id': 'd490d766-8b60-11e7-adba-e0accb8996e6a'},
+                           'body': '{"text": "blah", "checked": true}'}, self.context_mock)
+        self.assertEqual(response['statusCode'], 404)
+        body_json = json.loads(response['body'])
+        self.assertEquals('error' in body_json, True)
+        self.assertEquals(body_json['error'], 'NOT_FOUND')
+        self.assertEquals(body_json['error_message'], 'TODO was not found')

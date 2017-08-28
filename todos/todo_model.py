@@ -14,7 +14,7 @@ class TodoModel(Model):
     todo_id = UnicodeAttribute(hash_key=True, null=False)
     text = UnicodeAttribute(null=False)
     checked = BooleanAttribute(null=False, default=False)
-    created_at = UTCDateTimeAttribute(null=False, default=datetime.now())
+    created_at = UTCDateTimeAttribute(null=False)
     updated_at = UTCDateTimeAttribute(null=False)
 
     def save(self, conditional_operator=None, **expected_values):

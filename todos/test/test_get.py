@@ -1,10 +1,12 @@
 import json
+import os
 from unittest import TestCase
 from unittest.mock import patch, MagicMock
 
 from pynamodb.exceptions import DoesNotExist
 
 from todos.get import get
+from todos.test.test_todo_model_integration import TestIntegrationBase
 
 
 @patch('todos.get.TodoModel')
@@ -21,7 +23,7 @@ class TestGetEnvVar(TestCase):
 
 @patch('todos.get.TodoModel')
 @patch('os.environ', {'DYNAMODB_TABLE': 'todo_table',
-                           'DYNAMODB_REGION': 'eu-central-1'})
+                      'DYNAMODB_REGION': 'eu-central-1'})
 class TestGet(TestCase):
     def setUp(self):
         self.context_mock = MagicMock(function_name='get', aws_request_id='123')
@@ -53,3 +55,29 @@ class TestGet(TestCase):
         self.assertEquals('error_message' in body_json, False)
         self.assertEquals(body_json, todo_item)
         self.assertEqual(response['statusCode'], 200)
+
+
+@patch('os.environ', {'DYNAMODB_TABLE': 'todo_table',
+                      'DYNAMODB_REGION': 'eu-central-1'})
+class TestGetIntegration(TestIntegrationBase):
+    def setUp(self, load_dbs=None):
+        self.context_mock = MagicMock(function_name='get', aws_request_id='123')
+        super().setUp(load_dbs=[os.path.join(self.dir_path, 'fixtures/todo_db_0.json')])
+
+    def test_get(self):
+        response = get({'path': {'todo_id': 'd490d766-8b60-11e7-adba-e0accb8996e6'}}, self.context_mock)
+        self.assertEqual(response['statusCode'], 200)
+        body_json = json.loads(response['body'])
+        self.assertDictEqual(body_json, {'checked': False,
+                                         'created_at': '2017-08-27T21:49:25.310975+0000',
+                                         'text': 'text of d490d766-8b60-11e7-adba-e0accb8996e6',
+                                         'todo_id': 'd490d766-8b60-11e7-adba-e0accb8996e6',
+                                         'updated_at': '2017-08-27T21:49:25.779499+0000'})
+
+    def test_get_failed(self):
+        response = get({'path': {'todo_id': 'd490d766-8b60-11e7-adba-e0accb8996e6a'}}, self.context_mock)
+        self.assertEqual(response['statusCode'], 404)
+        body_json = json.loads(response['body'])
+        self.assertEquals('error' in body_json, True)
+        self.assertEquals(body_json['error'], 'NOT_FOUND')
+        self.assertEquals(body_json['error_message'], 'TODO was not found')

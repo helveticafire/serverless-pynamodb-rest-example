@@ -2,7 +2,10 @@ import json
 from unittest import TestCase
 from unittest.mock import patch, MagicMock
 
+from freezegun import freeze_time
+
 from todos.create import create
+from todos.test.test_todo_model_integration import TestIntegrationBase
 
 
 @patch('todos.create.TodoModel')
@@ -60,3 +63,31 @@ class TestCreate(TestCase):
             self.assertEquals('error' in body_json, False)
             self.assertEquals('error_message' in body_json, False)
             self.assertEqual(response['statusCode'], 201)
+
+
+@patch('os.environ', {'DYNAMODB_TABLE': 'todo_table',
+                      'DYNAMODB_REGION': 'eu-central-1'})
+@patch('uuid.uuid1', return_value='3f248497-7fa5-11e7-a657-e0accb8996e6')
+@freeze_time("2012-01-14 12:00:01")
+class TestCreateIntegration(TestIntegrationBase):
+    def setUp(self):
+        self.context_mock = MagicMock(function_name='create', aws_request_id='123')
+        super(TestCreateIntegration, self).setUp()
+
+    def test_create(self, _):
+        response = create({'body': '{"text": "blah"}'}, self.context_mock)
+        body_json = json.loads(response['body'])
+        self.assertEqual(response['statusCode'], 201)
+        self.assertEquals('error' in body_json, False)
+        self.assertEquals('error_message' in body_json, False)
+
+        self.assertEquals('todo_id' in body_json, True)
+        self.assertEquals('text' in body_json, True)
+        self.assertEquals('checked' in body_json, True)
+        self.assertEquals('created_at' in body_json, True)
+        self.assertEquals('updated_at' in body_json, True)
+        self.assertDictEqual(body_json, {'checked': False,
+                                         'created_at': '2012-01-14T12:00:01.000000+0000',
+                                         'text': 'blah',
+                                         'todo_id': '3f248497-7fa5-11e7-a657-e0accb8996e6',
+                                         'updated_at': '2012-01-14T12:00:01.000000+0000'})

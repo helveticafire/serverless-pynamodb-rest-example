@@ -1,3 +1,4 @@
+from datetime import datetime
 from unittest import TestCase
 import os
 import uuid
@@ -30,7 +31,8 @@ class TestTodoModelIntegrationBase(TestIntegrationBase):
         todo_text = 'text'
         todo_id = str(uuid.uuid1())
         t1 = TodoModel(todo_id=todo_id,
-                       text=todo_text)
+                       text=todo_text,
+                       created_at=datetime.now())
         t1.save()
         self.assertEquals(t1.text, todo_text)
         self.assertEquals(t1.checked, False)
@@ -48,7 +50,8 @@ class TestTodoModelCreateIntegrationBase(TestIntegrationBase):
         todo_text = 'text'
         todo_id = str(uuid.uuid1())
         t1 = TodoModel(todo_id=todo_id,
-                       text=todo_text)
+                       text=todo_text,
+                       created_at=datetime.now())
         t1.save()
         self.assertEquals(t1.text, todo_text)
         self.assertEquals(t1.checked, False)
@@ -65,6 +68,10 @@ class TestTodoModelGetIntegrationBase(TestIntegrationBase):
     def test_get(self):
         found_todo = TodoModel.get('d490d766-8b60-11e7-adba-e0accb8996e6')
         self.assertEquals(found_todo.text, 'text of d490d766-8b60-11e7-adba-e0accb8996e6')
+
+    def test_get_failed(self):
+        with self.assertRaises(DoesNotExist):
+            TodoModel.get('d490d766-8b60-11e7-adba-e0accb8996e6a')
 
 
 class TestTodoModelDeleteIntegrationBase(TestIntegrationBase):
