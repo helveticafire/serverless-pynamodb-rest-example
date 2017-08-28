@@ -1,10 +1,12 @@
 import json
+import os
 from unittest import TestCase
 from unittest.mock import patch, MagicMock
 
 from pynamodb.exceptions import DoesNotExist, DeleteError
 
 from todos.delete import delete
+from todos.test.test_todo_model_integration import TestIntegrationBase
 
 
 @patch('todos.delete.TodoModel')
@@ -21,7 +23,7 @@ class TestGetEnvVar(TestCase):
 
 @patch('todos.delete.TodoModel')
 @patch('os.environ', {'DYNAMODB_TABLE': 'todo_table',
-                           'DYNAMODB_REGION': 'eu-central-1'})
+                      'DYNAMODB_REGION': 'eu-central-1'})
 class TestDelete(TestCase):
     def setUp(self):
         self.context_mock = MagicMock(function_name='delete', aws_request_id='123')
@@ -64,3 +66,23 @@ class TestDelete(TestCase):
         mock_model.get.assert_called_once_with(hash_key='1')
         found_todo.delete.assert_called_once()
         self.assertEqual(response['statusCode'], 204)
+
+
+@patch('os.environ', {'DYNAMODB_TABLE': 'todo_table',
+                      'DYNAMODB_REGION': 'eu-central-1'})
+class TestDeleteIntegration(TestIntegrationBase):
+    def setUp(self, load_dbs=None):
+        self.context_mock = MagicMock(function_name='delete', aws_request_id='123')
+        super().setUp(load_dbs=[os.path.join(self.dir_path, 'fixtures/todo_db_0.json')])
+
+    def test_delete(self):
+        response = delete({'path': {'todo_id': 'd490d766-8b60-11e7-adba-e0accb8996e6'}}, self.context_mock)
+        self.assertEqual(response['statusCode'], 204)
+
+    def test_delete_get_failed(self):
+        response = delete({'path': {'todo_id': 'd490d766-8b60-11e7-adba-e0accb8996e6a'}}, self.context_mock)
+        self.assertEqual(response['statusCode'], 404)
+        body_json = json.loads(response['body'])
+        self.assertEquals('error' in body_json, True)
+        self.assertEquals(body_json['error'], 'NOT_FOUND')
+        self.assertEquals(body_json['error_message'], 'TODO was not found')

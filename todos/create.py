@@ -1,3 +1,4 @@
+from datetime import datetime
 import json
 import logging
 import os
@@ -38,7 +39,8 @@ def create(event, context):
 
     a_todo = TodoModel(todo_id=str(uuid.uuid1()),
                        text=data['text'],
-                       checked=False)
+                       checked=False,
+                       created_at=datetime.now())
 
     # write the todo to the database
     a_todo.save()
