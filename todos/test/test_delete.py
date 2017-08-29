@@ -40,7 +40,7 @@ class TestDelete(TestCase):
 
     def test_todo_not_found(self, mock_model):
         mock_model.get.side_effect = DoesNotExist()
-        response = delete({'path': {'todo_id': '1'}}, self.context_mock)
+        response = delete({'pathParameters': {'todo_id': '1'}}, self.context_mock)
         body_json = json.loads(response['body'])
         self.assertEquals('NOT_FOUND', body_json['error'])
         self.assertEquals('TODO was not found', body_json['error_message'])
@@ -50,7 +50,7 @@ class TestDelete(TestCase):
         found_todo = MagicMock()
         found_todo.delete.side_effect = DeleteError()
         mock_model.get.return_value = found_todo
-        response = delete({'path': {'todo_id': '1'}}, self.context_mock)
+        response = delete({'pathParameters': {'todo_id': '1'}}, self.context_mock)
         body_json = json.loads(response['body'])
         self.assertEquals('DELETE_FAILED', body_json['error'])
         self.assertEquals('Unable to delete the TODO', body_json['error_message'])
@@ -61,7 +61,7 @@ class TestDelete(TestCase):
         found_todo.checked = False
         found_todo.text = "blah"
         mock_model.get.return_value = found_todo
-        response = delete({'path': {'todo_id': '1'}}, self.context_mock)
+        response = delete({'pathParameters': {'todo_id': '1'}}, self.context_mock)
         self.assertEquals('body' in response, False)
         mock_model.get.assert_called_once_with(hash_key='1')
         found_todo.delete.assert_called_once()
@@ -76,11 +76,11 @@ class TestDeleteIntegration(TestIntegrationBase):
         super().setUp(load_dbs=[os.path.join(self.dir_path, 'fixtures/todo_db_0.json')])
 
     def test_delete(self):
-        response = delete({'path': {'todo_id': 'd490d766-8b60-11e7-adba-e0accb8996e6'}}, self.context_mock)
+        response = delete({'pathParameters': {'todo_id': 'd490d766-8b60-11e7-adba-e0accb8996e6'}}, self.context_mock)
         self.assertEqual(response['statusCode'], 204)
 
     def test_delete_get_failed(self):
-        response = delete({'path': {'todo_id': 'd490d766-8b60-11e7-adba-e0accb8996e6a'}}, self.context_mock)
+        response = delete({'pathParameters': {'todo_id': 'd490d766-8b60-11e7-adba-e0accb8996e6a'}}, self.context_mock)
         self.assertEqual(response['statusCode'], 404)
         body_json = json.loads(response['body'])
         self.assertEquals('error' in body_json, True)

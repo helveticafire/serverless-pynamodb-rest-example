@@ -40,7 +40,7 @@ class TestUpdate(TestCase):
         self.assertEqual(response['statusCode'], 422)
 
     def test_bad_json(self, _):
-        response = update({'body': '', 'path': {'todo_id': '1'}}, self.context_mock)
+        response = update({'body': '', 'pathParameters': {'todo_id': '1'}}, self.context_mock)
         body_json = json.loads(response['body'])
         self.assertEquals('JSON_IRREGULAR', body_json['error'])
         self.assertEquals('Expecting value: line 1 column 1 (char 0)', body_json['error_message'])
@@ -48,7 +48,7 @@ class TestUpdate(TestCase):
 
     def test_todo_not_found(self, mock_model):
         mock_model.get.side_effect = DoesNotExist()
-        response = update({'path': {'todo_id': '1'}}, self.context_mock)
+        response = update({'pathParameters': {'todo_id': '1'}}, self.context_mock)
         body_json = json.loads(response['body'])
         self.assertEquals('NOT_FOUND', body_json['error'])
         self.assertEquals('TODO was not found', body_json['error_message'])
@@ -56,7 +56,7 @@ class TestUpdate(TestCase):
 
     def test_text_missing(self, _):
         with patch('todos.create.logging.error'):
-            response = update({'path': {'todo_id': '1'},
+            response = update({'pathParameters': {'todo_id': '1'},
                                'body': '{}'}, self.context_mock)
             body_json = json.loads(response['body'])
             self.assertEquals('VALIDATION_FAILED', body_json['error'])
@@ -68,7 +68,7 @@ class TestUpdate(TestCase):
         found_todo.checked = False
         found_todo.text = "todo 1"
         mock_model.get.return_value = found_todo
-        response = update({'path': {'todo_id': '1'},
+        response = update({'pathParameters': {'todo_id': '1'},
                            'body': '{"text": "todo 1 update", "checked": true}'}, self.context_mock)
         body_json = json.loads(response['body'])
         mock_model.get.assert_called_once_with(hash_key='1')
@@ -83,7 +83,7 @@ class TestUpdate(TestCase):
         found_todo.text = "blah"
         mock_model.get.return_value = found_todo
         with patch('todos.create.logging.info'):
-            response = update({'path': {'todo_id': '1'},
+            response = update({'pathParameters': {'todo_id': '1'},
                                'body': '{"text": "blah", "checked": true}'}, self.context_mock)
             mock_model.get.assert_called_once_with(hash_key='1')
             body_json = json.loads(response['body'])
@@ -101,7 +101,7 @@ class TestDeleteIntegration(TestIntegrationBase):
         super().setUp(load_dbs=[os.path.join(self.dir_path, 'fixtures/todo_db_0.json')])
 
     def test_update(self):
-        response = update({'path': {'todo_id': 'd490d766-8b60-11e7-adba-e0accb8996e6'},
+        response = update({'pathParameters': {'todo_id': 'd490d766-8b60-11e7-adba-e0accb8996e6'},
                            'body': '{"text": "yayaya", "checked": true}'}, self.context_mock)
         self.assertEqual(response['statusCode'], 200)
         body_json = json.loads(response['body'])
@@ -113,7 +113,7 @@ class TestDeleteIntegration(TestIntegrationBase):
 
 
     def test_update_get_failed(self):
-        response = update({'path': {'todo_id': 'd490d766-8b60-11e7-adba-e0accb8996e6a'},
+        response = update({'pathParameters': {'todo_id': 'd490d766-8b60-11e7-adba-e0accb8996e6a'},
                            'body': '{"text": "blah", "checked": true}'}, self.context_mock)
         self.assertEqual(response['statusCode'], 404)
         body_json = json.loads(response['body'])

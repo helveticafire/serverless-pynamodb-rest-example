@@ -38,7 +38,7 @@ class TestGet(TestCase):
 
     def test_todo_not_found(self, mock_model):
         mock_model.get.side_effect = DoesNotExist()
-        response = get({'path': {'todo_id': '1'}}, self.context_mock)
+        response = get({'pathParameters': {'todo_id': '1'}}, self.context_mock)
         body_json = json.loads(response['body'])
         self.assertEquals('NOT_FOUND', body_json['error'])
         self.assertEquals('TODO was not found', body_json['error_message'])
@@ -48,7 +48,7 @@ class TestGet(TestCase):
         todo_item = {'todo_id': '1', 'text': 'hello'}
         mock_model.get.return_value = todo_item
 
-        response = get({'path': {'todo_id': '1'}}, self.context_mock)
+        response = get({'pathParameters': {'todo_id': '1'}}, self.context_mock)
         mock_model.get.assert_called_once_with(hash_key='1')
         body_json = json.loads(response['body'])
         self.assertEquals('error' in body_json, False)
@@ -65,7 +65,7 @@ class TestGetIntegration(TestIntegrationBase):
         super().setUp(load_dbs=[os.path.join(self.dir_path, 'fixtures/todo_db_0.json')])
 
     def test_get(self):
-        response = get({'path': {'todo_id': 'd490d766-8b60-11e7-adba-e0accb8996e6'}}, self.context_mock)
+        response = get({'pathParameters': {'todo_id': 'd490d766-8b60-11e7-adba-e0accb8996e6'}}, self.context_mock)
         self.assertEqual(response['statusCode'], 200)
         body_json = json.loads(response['body'])
         self.assertDictEqual(body_json, {'checked': False,
@@ -75,7 +75,7 @@ class TestGetIntegration(TestIntegrationBase):
                                          'updated_at': '2017-08-27T21:49:25.779499+0000'})
 
     def test_get_failed(self):
-        response = get({'path': {'todo_id': 'd490d766-8b60-11e7-adba-e0accb8996e6a'}}, self.context_mock)
+        response = get({'pathParameters': {'todo_id': 'd490d766-8b60-11e7-adba-e0accb8996e6a'}}, self.context_mock)
         self.assertEqual(response['statusCode'], 404)
         body_json = json.loads(response['body'])
         self.assertEquals('error' in body_json, True)
