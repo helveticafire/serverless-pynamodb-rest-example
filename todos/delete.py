@@ -18,7 +18,7 @@ def delete(event, context):
     TodoModel.setup_model(TodoModel, region, table_name, 'ENV' not in os.environ)
 
     try:
-        todo_id = event['path']['todo_id']
+        todo_id = event['pathParameters']['todo_id']
     except KeyError:
         return {'statusCode': 422,
                 'body': json.dumps({'error': 'URL_PARAMETER_MISSING',
