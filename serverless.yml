@@ -1,6 +1,6 @@
 service: serverless-rest-api-with-pynamodb
 
-frameworkVersion: ">=1.1.0 <2.0.0"
+frameworkVersion: ">=1.20.2 <2.0.0"
 
 plugins:
   - serverless-python-requirements
@@ -44,6 +44,7 @@ functions:
           path: todos
           method: post
           cors: true
+          integration: lambda-proxy
 
   list:
     handler: todos/list.todo_list
@@ -52,6 +53,7 @@ functions:
           path: todos
           method: get
           cors: true
+          integration: lambda-proxy
 
   get:
     handler: todos/get.get
@@ -60,10 +62,11 @@ functions:
           path: todos/{todo_id}
           method: get
           cors: true
-          integration: lambda
+          integration: lambda-proxy
           request:
-            paths:
-              todo_id: true
+            parameters:
+              paths:
+                todo_id: true
 
   update:
     handler: todos/update.update
@@ -72,10 +75,11 @@ functions:
           path: todos/{todo_id}
           method: put
           cors: true
-          integration: lambda
+          integration: lambda-proxy
           request:
-            paths:
-              todo_id: true
+            parameters:
+              paths:
+                todo_id: true
   delete:
     handler: todos/delete.delete
     events:
@@ -83,10 +87,11 @@ functions:
           path: todos/{todo_id}
           method: delete
           cors: true
-          integration: lambda
+          integration: lambda-proxy
           request:
-            paths:
-              todo_id: true
+            parameters:
+              paths:
+                todo_id: true
 
 resources:
   Resources:
