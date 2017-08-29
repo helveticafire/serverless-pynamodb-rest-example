@@ -1,5 +1,4 @@
 import json
-import logging
 import os
 
 from pynamodb.exceptions import DoesNotExist
@@ -8,7 +7,6 @@ from todos.todo_model import TodoModel
 
 
 def get(event, context):
-    logging.warning(event)
     try:
         table_name = os.environ['DYNAMODB_TABLE']
         region = os.environ['DYNAMODB_REGION']
