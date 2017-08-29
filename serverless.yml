@@ -21,6 +21,8 @@ provider:
   name: aws
   runtime: python3.6
   region: eu-central-1
+  apiKeys:
+    - ${self:service}-${opt:stage, self:provider.stage}
   environment:
     DYNAMODB_TABLE: ${self:service}-${opt:stage, self:provider.stage}
     DYNAMODB_REGION: ${self:provider.region}
@@ -45,6 +47,7 @@ functions:
           method: post
           cors: true
           integration: lambda-proxy
+          private: true
 
   list:
     handler: todos/list.todo_list
@@ -54,6 +57,7 @@ functions:
           method: get
           cors: true
           integration: lambda-proxy
+          private: true
 
   get:
     handler: todos/get.get
@@ -63,6 +67,7 @@ functions:
           method: get
           cors: true
           integration: lambda-proxy
+          private: true
           request:
             parameters:
               paths:
@@ -76,6 +81,7 @@ functions:
           method: put
           cors: true
           integration: lambda-proxy
+          private: true
           request:
             parameters:
               paths:
@@ -88,6 +94,7 @@ functions:
           method: delete
           cors: true
           integration: lambda-proxy
+          private: true
           request:
             parameters:
               paths:
