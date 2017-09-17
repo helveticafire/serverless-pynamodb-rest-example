@@ -26,7 +26,7 @@ class TestIntegrationBase(TestCase):
         super(TestIntegrationBase, self).tearDown()
 
 
-class TestTodoModelIntegrationBase(TestIntegrationBase):
+class TestTodoModelIntegration(TestIntegrationBase):
     def test_create(self):
         todo_text = 'text'
         todo_id = str(uuid.uuid1())
@@ -45,7 +45,7 @@ class TestTodoModelIntegrationBase(TestIntegrationBase):
         t2.delete()
 
 
-class TestTodoModelCreateIntegrationBase(TestIntegrationBase):
+class TestTodoModelCreateIntegration(TestIntegrationBase):
     def test_create(self):
         todo_text = 'text'
         todo_id = str(uuid.uuid1())
@@ -61,7 +61,7 @@ class TestTodoModelCreateIntegrationBase(TestIntegrationBase):
         self.assertEquals(t2.text, todo_text)
 
 
-class TestTodoModelGetIntegrationBase(TestIntegrationBase):
+class TestTodoModelGetIntegration(TestIntegrationBase):
     def setUp(self, load_dbs=None):
         super().setUp(load_dbs=[os.path.join(self.dir_path, 'fixtures/todo_db_0.json')])
 
@@ -74,7 +74,7 @@ class TestTodoModelGetIntegrationBase(TestIntegrationBase):
             TodoModel.get('d490d766-8b60-11e7-adba-e0accb8996e6a')
 
 
-class TestTodoModelDeleteIntegrationBase(TestIntegrationBase):
+class TestTodoModelDeleteIntegration(TestIntegrationBase):
     def setUp(self, load_dbs=None):
         dir_path = os.path.dirname(os.path.realpath(__file__))
         super().setUp(load_dbs=[os.path.join(dir_path, 'fixtures/todo_db_0.json')])
@@ -87,7 +87,7 @@ class TestTodoModelDeleteIntegrationBase(TestIntegrationBase):
             TodoModel.get('d490d766-8b60-11e7-adba-e0accb8996e6')
 
 
-class TestTodoModelScanIntegrationBase(TestIntegrationBase):
+class TestTodoModelScanIntegration(TestIntegrationBase):
     def setUp(self, load_dbs=None):
         super().setUp(load_dbs=[os.path.join(self.dir_path, 'fixtures/todo_db_0.json')])
 
@@ -99,7 +99,7 @@ class TestTodoModelScanIntegrationBase(TestIntegrationBase):
         self.assertEquals(todos[0].todo_id, 'd490d766-8b60-11e7-adba-e0accb8996e6')
 
 
-class TestTodoModelUpdateIntegrationBase(TestIntegrationBase):
+class TestTodoModelUpdateIntegration(TestIntegrationBase):
     def setUp(self, load_dbs=None):
         super().setUp(load_dbs=[os.path.join(self.dir_path, 'fixtures/todo_db_0.json')])
 
