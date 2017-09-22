@@ -32,8 +32,6 @@ def update(event, context):
                                     'error_message': 'TODO was not found'})}
 
     try:
-        # TODO: Figure out why this is behaving differently to the other endpoints
-        # Getting type error on the json.loads
         data = json.loads(event['body'])
     except ValueError as err:
         return {'statusCode': 400,
