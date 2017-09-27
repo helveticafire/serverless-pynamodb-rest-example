@@ -27,7 +27,7 @@ class TestGetEnvVar(TestCase):
 class TestDelete(TestCase):
     def setUp(self):
         self.context_mock = MagicMock(function_name='delete', aws_request_id='123')
-        super(TestDelete, self).setUp()
+        super().setUp()
 
     def test_path_param_missing(self, _):
         response = handle({}, self.context_mock)

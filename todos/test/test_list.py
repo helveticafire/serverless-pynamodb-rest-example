@@ -25,7 +25,7 @@ class TestListEnvVar(TestCase):
 class TestList(TestCase):
     def setUp(self):
         self.context_mock = MagicMock(function_name='list', aws_request_id='123')
-        super(TestList, self).setUp()
+        super().setUp()
 
     def test_list_success(self, mock_model):
         todo_item = {'todo_id': '1', 'text': 'hello'}

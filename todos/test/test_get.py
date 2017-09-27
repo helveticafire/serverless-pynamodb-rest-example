@@ -27,7 +27,7 @@ class TestGetEnvVar(TestCase):
 class TestGet(TestCase):
     def setUp(self):
         self.context_mock = MagicMock(function_name='get', aws_request_id='123')
-        super(TestGet, self).setUp()
+        super().setUp()
 
     def test_path_param_missing(self, _):
         response = handle({}, self.context_mock)

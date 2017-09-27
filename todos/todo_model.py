@@ -19,7 +19,7 @@ class TodoModel(Model):
 
     def save(self, conditional_operator=None, **expected_values):
         self.updated_at = datetime.utcnow()
-        super(TodoModel, self).save()
+        super().save()
 
     def __iter__(self):
         for name, attr in self._get_attributes().items():

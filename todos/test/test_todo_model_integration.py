@@ -18,12 +18,12 @@ class TestIntegrationBase(TestCase):
         if load_dbs:
             for db_file in load_dbs:
                 TodoModel.load(db_file)
-        super(TestIntegrationBase, self).setUp()
+        super().setUp()
 
     def tearDown(self):
         if TodoModel.exists():
             TodoModel.delete_table()
-        super(TestIntegrationBase, self).tearDown()
+        super().tearDown()
 
 
 class TestTodoModelIntegration(TestIntegrationBase):

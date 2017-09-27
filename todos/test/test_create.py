@@ -26,7 +26,7 @@ class TestCreateEnvVar(TestCase):
 class TestCreate(TestCase):
     def setUp(self):
         self.context_mock = MagicMock(function_name='create', aws_request_id='123')
-        super(TestCreate, self).setUp()
+        super().setUp()
 
     def test_bad_json(self, _):
         response = handle({'body': ''}, self.context_mock)
@@ -70,9 +70,9 @@ class TestCreate(TestCase):
 @patch('uuid.uuid1', return_value='3f248497-7fa5-11e7-a657-e0accb8996e6')
 @freeze_time("2012-01-14 12:00:01")
 class TestCreateIntegration(TestIntegrationBase):
-    def setUp(self):
+    def setUp(self, load_dbs=None):
         self.context_mock = MagicMock(function_name='create', aws_request_id='123')
-        super(TestCreateIntegration, self).setUp()
+        super().setUp(load_dbs)
 
     def test_create(self, _):
         response = handle({'body': '{"text": "blah"}'}, self.context_mock)
