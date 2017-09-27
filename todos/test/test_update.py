@@ -111,7 +111,6 @@ class TestDeleteIntegration(TestIntegrationBase):
                                          'todo_id': 'd490d766-8b60-11e7-adba-e0accb8996e6',
                                          'updated_at': '2017-01-14T12:00:01.000000+0000'})
 
-
     def test_update_get_failed(self):
         response = handle({'pathParameters': {'todo_id': 'd490d766-8b60-11e7-adba-e0accb8996e6a'},
                            'body': '{"text": "blah", "checked": true}'}, self.context_mock)
