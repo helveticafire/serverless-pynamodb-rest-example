@@ -6,7 +6,7 @@ from pynamodb.exceptions import DoesNotExist, DeleteError
 from todos.todo_model import TodoModel
 
 
-def delete(event, context):
+def handle(event, context):
     try:
         table_name = os.environ['DYNAMODB_TABLE']
         region = os.environ['DYNAMODB_REGION']

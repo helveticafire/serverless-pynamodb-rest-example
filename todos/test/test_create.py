@@ -4,7 +4,7 @@ from unittest.mock import patch, MagicMock
 
 from freezegun import freeze_time
 
-from todos.create import create
+from todos.create import handle
 from todos.test.test_todo_model_integration import TestIntegrationBase
 
 
@@ -13,7 +13,7 @@ class TestCreateEnvVar(TestCase):
     @patch('os.environ', {})
     def test_env_missing_all_vars(self, _):
         context_mock = MagicMock(function_name='create', aws_request_id='123')
-        response = create({}, context_mock)
+        response = handle({}, context_mock)
         body_json = json.loads(response['body'])
         self.assertEquals('ENV_VAR_NOT_SET', body_json['error'])
         self.assertEquals('\'DYNAMODB_TABLE\' is missing from environment variables', body_json['error_message'])
@@ -29,7 +29,7 @@ class TestCreate(TestCase):
         super(TestCreate, self).setUp()
 
     def test_bad_json(self, _):
-        response = create({'body': ''}, self.context_mock)
+        response = handle({'body': ''}, self.context_mock)
         body_json = json.loads(response['body'])
         self.assertEquals('JSON_IRREGULAR', body_json['error'])
         self.assertEquals('Expecting value: line 1 column 1 (char 0)', body_json['error_message'])
@@ -37,7 +37,7 @@ class TestCreate(TestCase):
 
     def test_text_missing_from_body(self, _):
         with patch('todos.create.logging.error'):
-            response = create({'body': '{}'}, self.context_mock)
+            response = handle({'body': '{}'}, self.context_mock)
         body_json = json.loads(response['body'])
         self.assertEquals('BODY_PROPERTY_MISSING', body_json['error'])
         self.assertEquals('Couldn\'t create the todo item.', body_json['error_message'])
@@ -45,7 +45,7 @@ class TestCreate(TestCase):
 
     def test_text_value_empty(self, _):
         with patch('todos.create.logging.error'):
-            response = create({'body': '{"text": ""}'}, self.context_mock)
+            response = handle({'body': '{"text": ""}'}, self.context_mock)
             body_json = json.loads(response['body'])
             self.assertEquals('VALIDATION_FAILED', body_json['error'])
             self.assertEquals('Couldn\'t create the todo item. As text was empty.', body_json['error_message'])
@@ -55,7 +55,7 @@ class TestCreate(TestCase):
         with patch('uuid.uuid1', return_value='3f248497-7fa5-11e7-a657-e0accb8996e6') as mock_id:
             created_todo = MagicMock(text='blah', todo_id=mock_id)
             mock_model.return_value = created_todo
-            response = create({'body': '{"text": "blah"}'}, self.context_mock)
+            response = handle({'body': '{"text": "blah"}'}, self.context_mock)
             body_json = json.loads(response['body'])
             # TODO: figure out why this is not working. -
             created_todo.save.assert_called()
@@ -75,7 +75,7 @@ class TestCreateIntegration(TestIntegrationBase):
         super(TestCreateIntegration, self).setUp()
 
     def test_create(self, _):
-        response = create({'body': '{"text": "blah"}'}, self.context_mock)
+        response = handle({'body': '{"text": "blah"}'}, self.context_mock)
         body_json = json.loads(response['body'])
         self.assertEqual(response['statusCode'], 201)
         self.assertEquals('error' in body_json, False)

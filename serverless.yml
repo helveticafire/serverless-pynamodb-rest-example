@@ -40,7 +40,7 @@ provider:
 
 functions:
   create:
-    handler: todos/create.create
+    handler: todos/create.handle
     events:
       - http:
           path: todos
@@ -50,7 +50,7 @@ functions:
           private: true
 
   list:
-    handler: todos/list.todo_list
+    handler: todos/list.handle
     events:
       - http:
           path: todos
@@ -60,7 +60,7 @@ functions:
           private: true
 
   get:
-    handler: todos/get.get
+    handler: todos/get.handle
     events:
       - http:
           path: todos/{todo_id}
@@ -74,7 +74,7 @@ functions:
                 todo_id: true
 
   update:
-    handler: todos/update.update
+    handler: todos/update.handle
     events:
       - http:
           path: todos/{todo_id}
@@ -87,7 +87,7 @@ functions:
               paths:
                 todo_id: true
   delete:
-    handler: todos/delete.delete
+    handler: todos/delete.handle
     events:
       - http:
           path: todos/{todo_id}

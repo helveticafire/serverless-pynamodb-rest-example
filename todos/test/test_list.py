@@ -3,7 +3,7 @@ import os
 from unittest import TestCase
 from unittest.mock import patch, MagicMock
 
-from todos.list import todo_list
+from todos.list import handle
 from todos.test.test_todo_model_integration import TestIntegrationBase
 
 
@@ -12,7 +12,7 @@ from todos.test.test_todo_model_integration import TestIntegrationBase
 class TestListEnvVar(TestCase):
     def test_env_missing_vars(self, _):
         context_mock = MagicMock(function_name='list', aws_request_id='123')
-        response = todo_list({}, context_mock)
+        response = handle({}, context_mock)
         body_json = json.loads(response['body'])
         self.assertEquals('ENV_VAR_NOT_SET', body_json['error'])
         self.assertEquals('\'DYNAMODB_TABLE\' is missing from environment variables', body_json['error_message'])
@@ -30,7 +30,7 @@ class TestList(TestCase):
     def test_list_success(self, mock_model):
         todo_item = {'todo_id': '1', 'text': 'hello'}
         mock_model.scan.return_value = [todo_item]
-        response = todo_list({}, self.context_mock)
+        response = handle({}, self.context_mock)
         mock_model.scan.assert_called_once()
         body_json = json.loads(response['body'])
         self.assertEquals('error' in body_json, False)
@@ -48,7 +48,7 @@ class TestListIntegration(TestIntegrationBase):
         super().setUp(load_dbs=[os.path.join(self.dir_path, 'fixtures/todo_db_0.json')])
 
     def test_scan(self):
-        response = todo_list({}, self.context_mock)
+        response = handle({}, self.context_mock)
         self.assertEqual(response['statusCode'], 200)
         body_json = json.loads(response['body'])
         self.assertEquals('error' in body_json, False)

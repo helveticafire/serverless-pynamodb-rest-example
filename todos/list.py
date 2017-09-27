@@ -4,7 +4,7 @@ import os
 from todos.todo_model import TodoModel
 
 
-def todo_list(event, context):
+def handle(event, context):
     try:
         table_name = os.environ['DYNAMODB_TABLE']
         region = os.environ['DYNAMODB_REGION']
