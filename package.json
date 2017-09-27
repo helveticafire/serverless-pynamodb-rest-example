@@ -1,5 +1,6 @@
 {
   "name": "aws-rest-with-pynamodb",
+  "repository": "https://github.com/helveticafire/serverless-pynamodb-rest-example",
   "version": "1.0.0",
   "description": "Serverless CRUD service exposing a REST HTTP interface",
   "author": "",
