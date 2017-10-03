@@ -60,7 +60,7 @@ class TestUpdate(TestCase):
                                'body': '{}'}, self.context_mock)
             body_json = json.loads(response['body'])
             self.assertEquals('VALIDATION_FAILED', body_json['error'])
-            self.assertEquals('Couldn\'t update the todo item.', body_json['error_message'])
+            self.assertEquals('Could not update the todo item.', body_json['error_message'])
             self.assertEqual(response['statusCode'], 422)
 
     def test_update_successful(self, mock_model):

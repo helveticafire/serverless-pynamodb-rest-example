@@ -42,7 +42,7 @@ def handle(event, context):
         logging.error('Validation Failed %s', data)
         return {'statusCode': 422,
                 'body': json.dumps({'error': 'VALIDATION_FAILED',
-                                    'error_message': 'Couldn\'t update the todo item.'})}
+                                    'error_message': 'Could not update the todo item.'})}
 
     text_attr_changed = 'text' in data and data['text'] != found_todo.text
     if text_attr_changed:

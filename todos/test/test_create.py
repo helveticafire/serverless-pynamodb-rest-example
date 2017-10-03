@@ -40,7 +40,7 @@ class TestCreate(TestCase):
             response = handle({'body': '{}'}, self.context_mock)
         body_json = json.loads(response['body'])
         self.assertEquals('BODY_PROPERTY_MISSING', body_json['error'])
-        self.assertEquals('Couldn\'t create the todo item.', body_json['error_message'])
+        self.assertEquals('Could not create the todo item.', body_json['error_message'])
         self.assertEqual(response['statusCode'], 422)
 
     def test_text_value_empty(self, _):
@@ -48,7 +48,7 @@ class TestCreate(TestCase):
             response = handle({'body': '{"text": ""}'}, self.context_mock)
             body_json = json.loads(response['body'])
             self.assertEquals('VALIDATION_FAILED', body_json['error'])
-            self.assertEquals('Couldn\'t create the todo item. As text was empty.', body_json['error_message'])
+            self.assertEquals('Could not create the todo item. As text was empty.', body_json['error_message'])
             self.assertEqual(response['statusCode'], 422)
 
     def test_create(self, mock_model):
