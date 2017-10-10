@@ -37,7 +37,7 @@ class TestUpdate(TestCase):
         body_json = json.loads(response['body'])
         self.assertEquals('URL_PARAMETER_MISSING', body_json['error'])
         self.assertEquals('TODO id missing from url', body_json['error_message'])
-        self.assertEqual(response['statusCode'], 422)
+        self.assertEqual(response['statusCode'], 400)
 
     def test_bad_json(self, _):
         response = handle({'body': '', 'pathParameters': {'todo_id': '1'}}, self.context_mock)
@@ -61,7 +61,7 @@ class TestUpdate(TestCase):
             body_json = json.loads(response['body'])
             self.assertEquals('VALIDATION_FAILED', body_json['error'])
             self.assertEquals('Could not update the todo item.', body_json['error_message'])
-            self.assertEqual(response['statusCode'], 422)
+            self.assertEqual(response['statusCode'], 400)
 
     def test_update_successful(self, mock_model):
         found_todo = MagicMock()

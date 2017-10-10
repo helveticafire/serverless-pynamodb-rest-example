@@ -41,7 +41,7 @@ class TestCreate(TestCase):
         body_json = json.loads(response['body'])
         self.assertEquals('BODY_PROPERTY_MISSING', body_json['error'])
         self.assertEquals('Could not create the todo item.', body_json['error_message'])
-        self.assertEqual(response['statusCode'], 422)
+        self.assertEqual(response['statusCode'], 400)
 
     def test_text_value_empty(self, _):
         with patch('todos.create.logging.error'):
@@ -49,7 +49,7 @@ class TestCreate(TestCase):
             body_json = json.loads(response['body'])
             self.assertEquals('VALIDATION_FAILED', body_json['error'])
             self.assertEquals('Could not create the todo item. As text was empty.', body_json['error_message'])
-            self.assertEqual(response['statusCode'], 422)
+            self.assertEqual(response['statusCode'], 400)
 
     def test_create(self, mock_model):
         with patch('uuid.uuid1', return_value='3f248497-7fa5-11e7-a657-e0accb8996e6') as mock_id:

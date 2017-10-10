@@ -34,7 +34,7 @@ class TestGet(TestCase):
         body_json = json.loads(response['body'])
         self.assertEquals('URL_PARAMETER_MISSING', body_json['error'])
         self.assertEquals('TODO id missing from url', body_json['error_message'])
-        self.assertEqual(response['statusCode'], 422)
+        self.assertEqual(response['statusCode'], 400)
 
     def test_todo_not_found(self, mock_model):
         mock_model.get.side_effect = DoesNotExist()

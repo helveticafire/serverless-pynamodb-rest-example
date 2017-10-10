@@ -1,3 +1,4 @@
+from http import HTTPStatus
 import json
 import os
 
@@ -9,7 +10,7 @@ def handle(event, context):
         table_name = os.environ['DYNAMODB_TABLE']
         region = os.environ['DYNAMODB_REGION']
     except KeyError as err:
-        return {'statusCode': 500,
+        return {'statusCode': HTTPStatus.INTERNAL_SERVER_ERROR.value,
                 'body': json.dumps({'error': 'ENV_VAR_NOT_SET',
                                     'error_message': '{0} is missing from environment variables'.format(str(err))})}
 
@@ -19,5 +20,5 @@ def handle(event, context):
     results = TodoModel.scan()
 
     # create a response
-    return {'statusCode': 200,
+    return {'statusCode': HTTPStatus.OK.value,
             'body': json.dumps({'items': [dict(result) for result in results]})}
