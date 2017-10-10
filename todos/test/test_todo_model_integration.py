@@ -12,7 +12,7 @@ class TestIntegrationBase(TestCase):
     dir_path = os.path.dirname(os.path.realpath(__file__))
 
     def setUp(self, load_dbs=None):
-        TodoModel.setup_model(TodoModel, 'region', 'todo' + str(uuid.uuid1()), 'ENV' not in os.environ)
+        TodoModel.setup_model(TodoModel, 'region', 'todo' + str(uuid.uuid1()), 'ENVIRONMENT' not in os.environ)
         if not TodoModel.exists():
             TodoModel.create_table(wait=True)
         if load_dbs:
