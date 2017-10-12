@@ -30,7 +30,6 @@ class HttpNoContentResponse(HttpResponseLambdaBase):
 
 
 class HttpJSONResponse(HttpResponseLambdaBase):
-
     def __init__(self, status=None, body=None):
         if status is not None:
             try:
@@ -44,8 +43,19 @@ class HttpJSONResponse(HttpResponseLambdaBase):
             self.body = json.dumps(body)
 
 
-class HttpErrorResponseBase(HttpJSONResponse):
+class HttpOkJSONResponse(HttpResponseLambdaBase):
+    def __init__(self, body=None):
+        override_body = body
+        if not body:
+            override_body = {}
+        self.body = json.dumps(override_body)
 
+
+class HttpCreatedJSONResponse(HttpOkJSONResponse):
+    status_code = http.HTTPStatus.CREATED.value
+
+
+class HttpErrorResponseBase(HttpJSONResponse):
     def __init__(self, status=None, error_code=None, error_message=None):
         body = {'error_code': error_code,
                 'error_message': error_message}
@@ -53,7 +63,6 @@ class HttpErrorResponseBase(HttpJSONResponse):
 
 
 class HttpResponseNotFound(HttpErrorResponseBase):
-
     def __init__(self, error_message=None):
         super().__init__(status=http.HTTPStatus.NOT_FOUND.value,
                          error_code='NOT_FOUND',
@@ -61,7 +70,6 @@ class HttpResponseNotFound(HttpErrorResponseBase):
 
 
 class HttpResponseBadRequest(HttpErrorResponseBase):
-
     def __init__(self, error_code=None, error_message=None):
         super().__init__(status=http.HTTPStatus.BAD_REQUEST.value,
                          error_code=error_code,
@@ -69,7 +77,6 @@ class HttpResponseBadRequest(HttpErrorResponseBase):
 
 
 class HttpResponseServerError(HttpErrorResponseBase):
-
     def __init__(self, error_code=None, error_message=None):
         super().__init__(status=http.HTTPStatus.INTERNAL_SERVER_ERROR.value,
                          error_code=error_code,

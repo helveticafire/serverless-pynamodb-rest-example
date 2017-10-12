@@ -4,11 +4,9 @@ from unittest import TestCase
 from unittest.mock import patch, MagicMock
 
 from freezegun import freeze_time
-
 from pynamodb.exceptions import DoesNotExist
 
 from todos.test.test_todo_model_integration import TestIntegrationBase
-
 from todos.update import handle
 
 
@@ -19,7 +17,7 @@ class TestUpdateEnvVar(TestCase):
         context_mock = MagicMock(function_name='update', aws_request_id='123')
         response = handle({}, context_mock)
         body_json = json.loads(response['body'])
-        self.assertEquals('ENV_VAR_NOT_SET', body_json['error'])
+        self.assertEquals('ENV_VAR_NOT_SET', body_json['error_code'])
         self.assertEquals('\'DYNAMODB_TABLE\' is missing from environment variables', body_json['error_message'])
         self.assertEqual(response['statusCode'], 500)
 
@@ -35,14 +33,14 @@ class TestUpdate(TestCase):
     def test_path_param_missing(self, _):
         response = handle({}, self.context_mock)
         body_json = json.loads(response['body'])
-        self.assertEquals('URL_PARAMETER_MISSING', body_json['error'])
+        self.assertEquals('URL_PARAMETER_MISSING', body_json['error_code'])
         self.assertEquals('TODO id missing from url', body_json['error_message'])
         self.assertEqual(response['statusCode'], 400)
 
     def test_bad_json(self, _):
         response = handle({'body': '', 'pathParameters': {'todo_id': '1'}}, self.context_mock)
         body_json = json.loads(response['body'])
-        self.assertEquals('JSON_IRREGULAR', body_json['error'])
+        self.assertEquals('JSON_IRREGULAR', body_json['error_code'])
         self.assertEquals('Expecting value: line 1 column 1 (char 0)', body_json['error_message'])
         self.assertEqual(response['statusCode'], 400)
 
@@ -50,7 +48,7 @@ class TestUpdate(TestCase):
         mock_model.get.side_effect = DoesNotExist()
         response = handle({'pathParameters': {'todo_id': '1'}}, self.context_mock)
         body_json = json.loads(response['body'])
-        self.assertEquals('NOT_FOUND', body_json['error'])
+        self.assertEquals('NOT_FOUND', body_json['error_code'])
         self.assertEquals('TODO was not found', body_json['error_message'])
         self.assertEqual(response['statusCode'], 404)
 
@@ -59,7 +57,7 @@ class TestUpdate(TestCase):
             response = handle({'pathParameters': {'todo_id': '1'},
                                'body': '{}'}, self.context_mock)
             body_json = json.loads(response['body'])
-            self.assertEquals('VALIDATION_FAILED', body_json['error'])
+            self.assertEquals('VALIDATION_FAILED', body_json['error_code'])
             self.assertEquals('Could not update the todo item.', body_json['error_message'])
             self.assertEqual(response['statusCode'], 400)
 
@@ -116,6 +114,6 @@ class TestDeleteIntegration(TestIntegrationBase):
                            'body': '{"text": "blah", "checked": true}'}, self.context_mock)
         self.assertEqual(response['statusCode'], 404)
         body_json = json.loads(response['body'])
-        self.assertEquals('error' in body_json, True)
-        self.assertEquals(body_json['error'], 'NOT_FOUND')
+        self.assertEquals('error_code' in body_json, True)
+        self.assertEquals(body_json['error_code'], 'NOT_FOUND')
         self.assertEquals(body_json['error_message'], 'TODO was not found')

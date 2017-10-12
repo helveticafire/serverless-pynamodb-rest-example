@@ -16,7 +16,7 @@ class TestGetEnvVar(TestCase):
         context_mock = MagicMock(function_name='get', aws_request_id='123')
         response = handle({}, context_mock)
         body_json = json.loads(response['body'])
-        self.assertEquals('ENV_VAR_NOT_SET', body_json['error'])
+        self.assertEquals('ENV_VAR_NOT_SET', body_json['error_code'])
         self.assertEquals('\'DYNAMODB_TABLE\' is missing from environment variables', body_json['error_message'])
         self.assertEqual(response['statusCode'], 500)
 
@@ -32,7 +32,7 @@ class TestGet(TestCase):
     def test_path_param_missing(self, _):
         response = handle({}, self.context_mock)
         body_json = json.loads(response['body'])
-        self.assertEquals('URL_PARAMETER_MISSING', body_json['error'])
+        self.assertEquals('URL_PARAMETER_MISSING', body_json['error_code'])
         self.assertEquals('TODO id missing from url', body_json['error_message'])
         self.assertEqual(response['statusCode'], 400)
 
@@ -40,7 +40,7 @@ class TestGet(TestCase):
         mock_model.get.side_effect = DoesNotExist()
         response = handle({'pathParameters': {'todo_id': '1'}}, self.context_mock)
         body_json = json.loads(response['body'])
-        self.assertEquals('NOT_FOUND', body_json['error'])
+        self.assertEquals('NOT_FOUND', body_json['error_code'])
         self.assertEquals('TODO was not found', body_json['error_message'])
         self.assertEqual(response['statusCode'], 404)
 
@@ -51,7 +51,7 @@ class TestGet(TestCase):
         response = handle({'pathParameters': {'todo_id': '1'}}, self.context_mock)
         mock_model.get.assert_called_once_with(hash_key='1')
         body_json = json.loads(response['body'])
-        self.assertEquals('error' in body_json, False)
+        self.assertEquals('error_code' in body_json, False)
         self.assertEquals('error_message' in body_json, False)
         self.assertEquals(body_json, todo_item)
         self.assertEqual(response['statusCode'], 200)
@@ -78,6 +78,6 @@ class TestGetIntegration(TestIntegrationBase):
         response = handle({'pathParameters': {'todo_id': 'd490d766-8b60-11e7-adba-e0accb8996e6a'}}, self.context_mock)
         self.assertEqual(response['statusCode'], 404)
         body_json = json.loads(response['body'])
-        self.assertEquals('error' in body_json, True)
-        self.assertEquals(body_json['error'], 'NOT_FOUND')
+        self.assertEquals('error_code' in body_json, True)
+        self.assertEquals(body_json['error_code'], 'NOT_FOUND')
         self.assertEquals(body_json['error_message'], 'TODO was not found')

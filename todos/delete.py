@@ -1,9 +1,9 @@
 import os
 
 from pynamodb.exceptions import DoesNotExist, DeleteError
+
 from todos.lambda_responses import HttpNoContentResponse, HttpResponseNotFound, HttpResponseBadRequest, \
     HttpResponseServerError
-
 from todos.todo_model import TodoModel
 from utils.constants import ENV_VAR_ENVIRONMENT, ENV_VAR_DYNAMODB_TABLE, ENV_VAR_DYNAMODB_REGION
 
