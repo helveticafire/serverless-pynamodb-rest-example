@@ -15,7 +15,7 @@ class TestCreateEnvVar(TestCase):
         context_mock = MagicMock(function_name='create', aws_request_id='123')
         response = handle({}, context_mock)
         body_json = json.loads(response['body'])
-        self.assertEquals('ENV_VAR_NOT_SET', body_json['error'])
+        self.assertEquals('ENV_VAR_NOT_SET', body_json['error_code'])
         self.assertEquals('\'DYNAMODB_TABLE\' is missing from environment variables', body_json['error_message'])
         self.assertEqual(response['statusCode'], 500)
 
@@ -31,7 +31,7 @@ class TestCreate(TestCase):
     def test_bad_json(self, _):
         response = handle({'body': ''}, self.context_mock)
         body_json = json.loads(response['body'])
-        self.assertEquals('JSON_IRREGULAR', body_json['error'])
+        self.assertEquals('JSON_IRREGULAR', body_json['error_code'])
         self.assertEquals('Expecting value: line 1 column 1 (char 0)', body_json['error_message'])
         self.assertEqual(response['statusCode'], 400)
 
@@ -39,7 +39,7 @@ class TestCreate(TestCase):
         with patch('todos.create.logging.error'):
             response = handle({'body': '{}'}, self.context_mock)
         body_json = json.loads(response['body'])
-        self.assertEquals('BODY_PROPERTY_MISSING', body_json['error'])
+        self.assertEquals('BODY_PROPERTY_MISSING', body_json['error_code'])
         self.assertEquals('Could not create the todo item.', body_json['error_message'])
         self.assertEqual(response['statusCode'], 400)
 
@@ -47,7 +47,7 @@ class TestCreate(TestCase):
         with patch('todos.create.logging.error'):
             response = handle({'body': '{"text": ""}'}, self.context_mock)
             body_json = json.loads(response['body'])
-            self.assertEquals('VALIDATION_FAILED', body_json['error'])
+            self.assertEquals('VALIDATION_FAILED', body_json['error_code'])
             self.assertEquals('Could not create the todo item. As text was empty.', body_json['error_message'])
             self.assertEqual(response['statusCode'], 400)
 
@@ -60,7 +60,7 @@ class TestCreate(TestCase):
             # TODO: figure out why this is not working. -
             created_todo.save.assert_called()
             # TODO: Test response is correct
-            self.assertEquals('error' in body_json, False)
+            self.assertEquals('error_code' in body_json, False)
             self.assertEquals('error_message' in body_json, False)
             self.assertEqual(response['statusCode'], 201)
 
@@ -78,7 +78,7 @@ class TestCreateIntegration(TestIntegrationBase):
         response = handle({'body': '{"text": "blah"}'}, self.context_mock)
         body_json = json.loads(response['body'])
         self.assertEqual(response['statusCode'], 201)
-        self.assertEquals('error' in body_json, False)
+        self.assertEquals('error_code' in body_json, False)
         self.assertEquals('error_message' in body_json, False)
 
         self.assertEquals('todo_id' in body_json, True)
