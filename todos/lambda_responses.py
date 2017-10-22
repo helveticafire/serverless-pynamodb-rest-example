@@ -62,6 +62,18 @@ class HttpErrorResponseBase(HttpJSONResponse):
         super().__init__(status, body)
 
 
+class HttpErrorValidationFailed(HttpJSONResponse):
+    def __init__(self, error_message=None, validation_violations=None):
+        if not validation_violations:
+            validation_violations = []
+        if not error_message:
+            error_message = ''
+        body = {'error_code': 'REQUEST_VALIDATION_FAILED',
+                'error_message': error_message,
+                'validation_violations': validation_violations}
+        super().__init__(http.HTTPStatus.BAD_REQUEST.value, body)
+
+
 class HttpResponseNotFound(HttpErrorResponseBase):
     def __init__(self, error_message=None):
         super().__init__(status=http.HTTPStatus.NOT_FOUND.value,

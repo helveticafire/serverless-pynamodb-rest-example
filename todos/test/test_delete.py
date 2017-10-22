@@ -31,12 +31,19 @@ class TestDelete(TestCase):
 
     def test_path_param_missing(self, _):
         response = handle({}, self.context_mock)
-        self.assertIn('URL_PARAMETER_MISSING', response['body'])
         body_json = json.loads(response['body'])
-        self.assertEquals('URL_PARAMETER_MISSING', body_json['error_code'])
+        self.assertEquals('REQUEST_VALIDATION_FAILED', body_json['error_code'])
         self.assertEquals('TODO id missing from url', body_json['error_message'])
 
         self.assertEqual(response['statusCode'], 400)
+
+    def test_todo_id_too_short(self, mock_model):
+        mock_model.get.side_effect = DoesNotExist()
+        response = handle({'pathParameters': {'todo_id': 'd490d766-8b60-11e7-adba-e0accb8996e'}}, self.context_mock)
+        body_json = json.loads(response['body'])
+        self.assertEquals('NOT_FOUND', body_json['error_code'])
+        self.assertEquals('TODO was not found', body_json['error_message'])
+        self.assertEqual(response['statusCode'], 404)
 
     def test_todo_not_found(self, mock_model):
         mock_model.get.side_effect = DoesNotExist()
@@ -81,8 +88,8 @@ class TestDeleteIntegration(TestIntegrationBase):
 
     def test_delete_get_failed(self):
         response = handle({'pathParameters': {'todo_id': 'd490d766-8b60-11e7-adba-e0accb8996e6a'}}, self.context_mock)
-        self.assertEqual(response['statusCode'], 404)
         body_json = json.loads(response['body'])
         self.assertEquals('error_code' in body_json, True)
         self.assertEquals(body_json['error_code'], 'NOT_FOUND')
+        self.assertEqual(response['statusCode'], 404)
         self.assertEquals(body_json['error_message'], 'TODO was not found')

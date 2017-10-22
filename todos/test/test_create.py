@@ -39,16 +39,46 @@ class TestCreate(TestCase):
         with patch('todos.create.logging.error'):
             response = handle({'body': '{}'}, self.context_mock)
         body_json = json.loads(response['body'])
-        self.assertEquals('BODY_PROPERTY_MISSING', body_json['error_code'])
-        self.assertEquals('Could not create the todo item.', body_json['error_message'])
+        self.assertEquals('REQUEST_VALIDATION_FAILED', body_json['error_code'])
+        self.assertEquals('Please check the validation violation made trying to make a Todo and retry.',
+                          body_json['error_message'])
+        self.assertTrue('validation_violations' in body_json)
+        # self.assertListEqual(body_json['validation_violations'],
+        #                      [{'message': "'text' is a required property",
+        #                        'original_value': {},
+        #                        'field': 'text'}])
         self.assertEqual(response['statusCode'], 400)
 
     def test_text_value_empty(self, _):
         with patch('todos.create.logging.error'):
             response = handle({'body': '{"text": ""}'}, self.context_mock)
             body_json = json.loads(response['body'])
-            self.assertEquals('VALIDATION_FAILED', body_json['error_code'])
-            self.assertEquals('Could not create the todo item. As text was empty.', body_json['error_message'])
+            self.assertEquals('REQUEST_VALIDATION_FAILED', body_json['error_code'])
+            self.assertEquals('Please check the validation violation made trying to make a Todo and retry.',
+                              body_json['error_message'])
+            self.assertTrue('validation_violations' in body_json)
+            # self.assertListEqual(body_json['validation_violations'],
+            #                      [{'message': "'' is too short",
+            #                        'original_value': {},
+            #                        'field': 'text'}])
+            self.assertEqual(response['statusCode'], 400)
+
+    def test_checked_wrong_type_and_text_empty(self, _):
+        with patch('todos.create.logging.error'):
+            response = handle({'body': '{"text": "", "checked": 1}'}, self.context_mock)
+            body_json = json.loads(response['body'])
+            self.assertEquals('REQUEST_VALIDATION_FAILED', body_json['error_code'])
+            self.assertEquals('Please check the validation violation made trying to make a Todo and retry.',
+                              body_json['error_message'])
+            self.assertTrue('validation_violations' in body_json)
+            self.assertEqual(response['statusCode'], 400)
+
+    def test_checked_double_text(self, _):
+        with patch('todos.create.logging.error'):
+            response = handle({'body': '{"text": "abc", "text": "xyz"}'}, self.context_mock)
+            body_json = json.loads(response['body'])
+            self.assertEquals('JSON_IRREGULAR', body_json['error_code'])
+            self.assertEquals('duplicate key: \'text\'', body_json['error_message'])
             self.assertEqual(response['statusCode'], 400)
 
     def test_create(self, mock_model):

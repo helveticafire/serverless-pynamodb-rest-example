@@ -1,6 +1,7 @@
 import os
 
 from pynamodb.exceptions import DoesNotExist
+from todos.endpoint_schemas import validate, SCHEMA_PATH
 
 from todos.lambda_responses import HttpResponseBadRequest, HttpResponseServerError, HttpResponseNotFound, \
     HttpOkJSONResponse
@@ -17,13 +18,14 @@ def handle(event, context):
         return HttpResponseServerError(error_code='ENV_VAR_NOT_SET',
                                        error_message=error_message).__dict__()
 
+    validation_result = validate(event, SCHEMA_PATH, 'Path parameters are incorrect')
+    if validation_result:
+        return validation_result
+
+    todo_id = event['pathParameters']['todo_id']
+
     TodoModel.setup_model(TodoModel, region, table_name, ENV_VAR_ENVIRONMENT not in os.environ)
 
-    try:
-        todo_id = event['pathParameters']['todo_id']
-    except KeyError:
-        return HttpResponseBadRequest(error_code='URL_PARAMETER_MISSING',
-                                      error_message='TODO id missing from url').__dict__()
     try:
         found_todo = TodoModel.get(hash_key=todo_id)
     except DoesNotExist:

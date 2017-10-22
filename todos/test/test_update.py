@@ -33,12 +33,12 @@ class TestUpdate(TestCase):
     def test_path_param_missing(self, _):
         response = handle({}, self.context_mock)
         body_json = json.loads(response['body'])
-        self.assertEquals('URL_PARAMETER_MISSING', body_json['error_code'])
-        self.assertEquals('TODO id missing from url', body_json['error_message'])
+        self.assertEquals('VALIDATION_FAILED', body_json['error_code'])
+        self.assertEquals('Path parameters are incorrect', body_json['error_message'])
         self.assertEqual(response['statusCode'], 400)
 
     def test_bad_json(self, _):
-        response = handle({'body': '', 'pathParameters': {'todo_id': '1'}}, self.context_mock)
+        response = handle({'body': '', 'pathParameters': {'todo_id': 'd490d766-8b60-11e7-adba-e0accb8996e6'}}, self.context_mock)
         body_json = json.loads(response['body'])
         self.assertEquals('JSON_IRREGULAR', body_json['error_code'])
         self.assertEquals('Expecting value: line 1 column 1 (char 0)', body_json['error_message'])
@@ -46,7 +46,8 @@ class TestUpdate(TestCase):
 
     def test_todo_not_found(self, mock_model):
         mock_model.get.side_effect = DoesNotExist()
-        response = handle({'pathParameters': {'todo_id': '1'}}, self.context_mock)
+        response = handle({'pathParameters': {'todo_id': '1'},
+                           'body': '{"text": "todo 1 update", "checked": true}'}, self.context_mock)
         body_json = json.loads(response['body'])
         self.assertEquals('NOT_FOUND', body_json['error_code'])
         self.assertEquals('TODO was not found', body_json['error_message'])
@@ -58,7 +59,9 @@ class TestUpdate(TestCase):
                                'body': '{}'}, self.context_mock)
             body_json = json.loads(response['body'])
             self.assertEquals('VALIDATION_FAILED', body_json['error_code'])
-            self.assertEquals('Could not update the todo item.', body_json['error_message'])
+            self.assertEquals('Please check the validation violation made trying to update a Todo and retry.',
+                              body_json['error_message'])
+            self.assertTrue('validation_violations' in body_json)
             self.assertEqual(response['statusCode'], 400)
 
     def test_update_successful(self, mock_model):

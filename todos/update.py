@@ -3,10 +3,12 @@ import logging
 import os
 
 from pynamodb.exceptions import DoesNotExist
+from todos.endpoint_schemas import SCHEMA_UPDATE_BODY, validate, SCHEMA_PATH
 
 from todos.lambda_responses import HttpResponseBadRequest, HttpResponseServerError, HttpResponseNotFound, \
     HttpOkJSONResponse
 from todos.todo_model import TodoModel
+from utils.utils import dict_raise_on_duplicates
 from utils.constants import ENV_VAR_ENVIRONMENT, ENV_VAR_DYNAMODB_TABLE, ENV_VAR_DYNAMODB_REGION
 
 
@@ -19,28 +21,29 @@ def handle(event, context):
         return HttpResponseServerError(error_code='ENV_VAR_NOT_SET',
                                        error_message=error_message).__dict__()
 
-    TodoModel.setup_model(TodoModel, region, table_name, ENV_VAR_ENVIRONMENT not in os.environ)
+    validation_result = validate(event, SCHEMA_PATH, 'Path parameters are incorrect')
+    if validation_result:
+        return validation_result
+
+    todo_id = event['pathParameters']['todo_id']
 
     try:
-        todo_id = event['pathParameters']['todo_id']
-    except KeyError:
-        return HttpResponseBadRequest(error_code='URL_PARAMETER_MISSING',
-                                      error_message='TODO id missing from url').__dict__()
-    try:
-        found_todo = TodoModel.get(hash_key=todo_id)
-    except DoesNotExist:
-        return HttpResponseNotFound(error_message='TODO was not found').__dict__()
-
-    try:
-        data = json.loads(event['body'])
+        data = json.loads(event['body'], object_pairs_hook=dict_raise_on_duplicates)
     except ValueError as err:
         return HttpResponseBadRequest(error_code='JSON_IRREGULAR',
                                       error_message=str(err)).__dict__()
 
-    if 'text' not in data and 'checked' not in data:
-        logging.error('Validation Failed %s', data)
-        return HttpResponseBadRequest(error_code='VALIDATION_FAILED',
-                                      error_message='Could not update the todo item.').__dict__()
+    validation_result = validate(event, SCHEMA_UPDATE_BODY,
+                                 'Please check the validation violation made trying to update a Todo and retry.')
+    if validation_result:
+        return validation_result
+
+    TodoModel.setup_model(TodoModel, region, table_name, ENV_VAR_ENVIRONMENT not in os.environ)
+
+    try:
+        found_todo = TodoModel.get(hash_key=todo_id)
+    except DoesNotExist:
+        return HttpResponseNotFound(error_message='TODO was not found').__dict__()
 
     text_attr_changed = 'text' in data and data['text'] != found_todo.text
     if text_attr_changed:
